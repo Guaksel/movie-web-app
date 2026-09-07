@@ -1,0 +1,14 @@
+{
+  "PREMIUM-118EA83F": {
+    "plan": "monthly",
+    "expires": "2026-09-29",
+    "daily_downloads": 50,
+    "active": true
+  },
+  "TRIAL-9F05BEA8": {
+    "plan": "trial",
+    "expires": "2026-09-06",
+    "daily_downloads": 5,
+    "active": true
+  }
+}

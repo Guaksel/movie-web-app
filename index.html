@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Universal Downloader Pro</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f23;--card:#1a1a3e;--text:#e0e0ff;--accent:#6c63ff;--accent2:#ff6b6b;--glass:rgba(26,26,62,0.8);--border:rgba(108,99,255,0.3);--font:'Segoe UI',Tahoma,sans-serif}
+[data-theme="light"]{--bg:#f0f2f5;--card:#fff;--text:#333;--accent:#5a52d5;--accent2:#e74c3c;--glass:rgba(255,255,255,0.95);--border:rgba(90,82,213,0.3)}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;transition:all .3s}
+.login-screen{display:flex;justify-content:center;align-items:center;min-height:100vh;background:linear-gradient(135deg,#0f0f23 0%,#1a1a3e 50%,#2d1b69 100%)}
+.login-box{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:20px;padding:40px;width:400px;text-align:center}
+.login-box h1{font-size:1.8em;margin-bottom:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.login-box p{color:rgba(255,255,255,0.6);margin-bottom:30px}
+.login-box input{width:100%;padding:14px 20px;border:2px solid var(--border);border-radius:12px;background:rgba(255,255,255,0.05);color:var(--text);font-size:16px;margin-bottom:15px;text-align:center}
+.login-box input:focus{outline:none;border-color:var(--accent)}
+.login-box button{width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:16px;font-weight:bold;cursor:pointer;transition:transform .2s}
+.login-box button:hover{transform:scale(1.02)}
+.login-box .error{color:var(--accent2);margin-top:10px;display:none}
+#mainApp{display:none;min-height:100vh}
+.header{background:var(--glass);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.header h2{font-size:1.1em;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-actions{display:flex;gap:8px;align-items:center}
+.header-actions button{padding:7px 12px;border:1px solid var(--border);border-radius:8px;background:var(--glass);color:var(--text);cursor:pointer;font-size:12px;transition:all .2s}
+.header-actions button:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.header-actions select{padding:6px 8px;border:1px solid var(--border);border-radius:8px;background:var(--glass);color:var(--text);font-size:12px;cursor:pointer}
+.tabs{display:flex;gap:4px;padding:10px 20px;overflow-x:auto;flex-wrap:nowrap}
+.tabs button{padding:10px 16px;border:1px solid var(--border);border-radius:10px;background:var(--glass);color:var(--text);cursor:pointer;white-space:nowrap;font-size:13px;transition:all .2s}
+.tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tab-content{padding:20px;max-width:1200px;margin:0 auto;display:none}
+.tab-content.active{display:block}
+.search-box{display:flex;gap:10px;margin-bottom:20px}
+.search-box input{flex:1;padding:14px 20px;border:2px solid var(--border);border-radius:12px;background:rgba(255,255,255,0.05);color:var(--text);font-size:16px}
+.search-box input:focus{outline:none;border-color:var(--accent)}
+.search-box button{padding:14px 24px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:16px;font-weight:bold;cursor:pointer}
+.card{background:var(--glass);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:15px;transition:transform .2s}
+.card:hover{transform:translateY(-2px)}
+.card-header{display:flex;gap:15px;align-items:flex-start}
+.card-poster{width:80px;height:120px;border-radius:8px;object-fit:cover;background:rgba(108,99,255,0.2);display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0}
+.card-info{flex:1}
+.card-info h3{font-size:1.05em;margin-bottom:5px;color:var(--accent)}
+.card-info p{font-size:0.88em;color:rgba(255,255,255,0.6);margin-bottom:3px}
+.card-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.card-actions button,.card-actions a{padding:8px 16px;border:none;border-radius:8px;font-size:13px;cursor:pointer;transition:all .2s;text-decoration:none}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-danger{background:var(--accent2);color:#fff}
+.btn-secondary{background:rgba(255,255,255,0.1);color:var(--text);border:1px solid var(--border)!important}
+.btn-success{background:#27ae60;color:#fff}
+.btn-primary:hover,.btn-danger:hover,.btn-success:hover{opacity:0.85}
+.server-table{width:100%;border-collapse:collapse;margin-top:10px}
+.server-table th,.server-table td{padding:10px 14px;border-bottom:1px solid var(--border);text-align:right;font-size:13px}
+.server-table th{background:rgba(108,99,255,0.1);color:var(--accent)}
+.sw-filter{display:flex;gap:6px;margin-bottom:15px;flex-wrap:wrap}
+.sw-filter button{padding:7px 14px;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--text);cursor:pointer;font-size:12px;transition:all .2s}
+.sw-filter button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.quran-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.quran-card{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:15px;cursor:pointer;transition:all .2s}
+.quran-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.quran-card .num{font-size:1.8em;font-weight:bold;color:var(--accent);float:right}
+.quran-card .name{font-size:1.05em;font-weight:bold}
+.quran-card .ayahs{float:left;font-size:0.85em;color:var(--accent2)}
+.quran-card .info{font-size:0.85em;color:rgba(255,255,255,0.5);clear:both;margin-top:4px}
+.settings-row{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+.settings-row input{flex:1;padding:10px 16px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,0.05);color:var(--text);font-size:14px}
+.settings-row button{padding:10px 16px;border:none;border-radius:8px;background:var(--accent);color:#fff;cursor:pointer}
+#downloadBar{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--glass);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:15px 20px;z-index:200}
+#downloadBar .dl-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+#downloadBar .dl-title{font-weight:bold;color:var(--accent);font-size:14px}
+#downloadBar .dl-status{font-size:13px;color:rgba(255,255,255,0.6)}
+.progress-bar{width:100%;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden;margin-bottom:8px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .3s;width:0%}
+#downloadBar .dl-details{display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,0.4);flex-wrap:wrap;gap:4px}
+#downloadBar .dl-actions{display:flex;gap:8px;margin-top:8px}
+#downloadBar .dl-actions button{padding:6px 14px;border:none;border-radius:6px;font-size:12px;cursor:pointer}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;justify-content:center;align-items:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;width:90%;max-width:480px;max-height:80vh;overflow-y:auto}
+.modal h3{margin-bottom:15px;color:var(--accent)}
+.modal select,.modal input[type="text"]{width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,0.05);color:var(--text);margin-bottom:10px;font-size:14px}
+.quality-options{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
+.quality-options label{padding:8px 14px;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:all .2s}
+.quality-options input:checked+label{background:var(--accent);color:#fff;border-color:var(--accent)}
+.loading{display:flex;justify-content:center;padding:40px}
+.spinner{width:40px;height:40px;border:4px solid var(--border);border-top:4px solid var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:40px;color:rgba(255,255,255,0.4)}
+.badge-free{background:#27ae60;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;margin-right:5px}
+.badge-paid{background:var(--accent2);color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;margin-right:5px}
+.compare-card{border-left:4px solid var(--accent)}
+.compare-free{color:#27ae60;font-weight:bold}
+.compare-paid{color:var(--accent2);font-weight:bold}
+.compare-price{font-size:13px;color:var(--text);opacity:0.7}
+select{padding:10px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,0.05);color:var(--text);font-size:14px}
+@media(max-width:768px){.tabs{padding:8px}.tab-content{padding:10px}.card-header{flex-direction:column}.search-box{flex-direction:column}.quran-grid{grid-template-columns:1fr}.server-table{font-size:12px}}
+/* تحسينات خفة وسلاسة */
+*{scroll-behavior:smooth}
+.card{will-change:transform;transition:transform .18s ease, box-shadow .18s ease}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(108,99,255,0.25)}
+.tabs button{transition:all .2s ease}
+.quran-card{transition:all .18s ease}
+.ayah{cursor:pointer;transition:background .15s ease}
+.ayah:hover{background:rgba(108,99,255,0.12) !important}
+#quranAudio{filter:drop-shadow(0 2px 8px rgba(0,0,0,0.2))}
+
+</style>
+</head>
+<body>
+<div class="login-screen" id="loginScreen">
+<div class="login-box glass">
+<h1 data-i18n="app_title">Universal Downloader Pro</h1>
+<p data-i18n="app_sub">Movies, Music, Books, Software & Quran</p>
+<input type="text" id="loginKey" data-i18n-ph="enter_key" autocomplete="off">
+<button onclick="doLogin()" id="loginBtn" data-i18n="login">Login</button>
+<div class="error" id="loginError"></div>
+</div>
+</div>
+<div id="mainApp">
+<div class="header">
+<h2 data-i18n="app_title">Universal Downloader Pro</h2>
+<div class="header-actions" style="flex-wrap:wrap">
+<select id="langSelect" onchange="setLang(this.value)">
+<option value="ar">العربية</option>
+<option value="en">English</option>
+<option value="fr">Français</option>
+<option value="ber">ⵜⴰⵎⴰⵣⵉⵖⵜ</option>
+<option value="de">Deutsch</option>
+<option value="es">Español</option>
+<option value="tr">Türkçe</option>
+<option value="ur">اردو</option>
+</select>
+<div style="display:flex;gap:4px;align-items:center;background:rgba(255,255,255,0.08);border:1px solid var(--border);border-radius:8px;padding:4px 6px">
+<button onclick="changeZoom(0.1)" title="تكبير" style="padding:4px 8px;font-size:14px">A+</button>
+<button onclick="changeZoom(-0.1)" title="تصغير" style="padding:4px 8px;font-size:14px">A-</button>
+<input type="range" id="brightnessRange" min="70" max="130" value="100" oninput="changeBrightness(this.value)" title="السطوع" style="width:60px">
+<span style="font-size:10px">☀️</span>
+</div>
+<button onclick="showSettings()" data-i18n="settings">⚙️</button>
+<button onclick="toggleTheme()" id="themeBtn" data-i18n="dark">🌙</button>
+<button onclick="doLogout()" data-i18n="logout">🚪</button>
+</div>
+</div>
+<div class="tabs" id="tabsBar">
+<button class="active" onclick="switchTab('movies',this)">🎬 <span data-i18n="tab_movies">Movies</span></button>
+<button onclick="switchTab('music',this)">🎵 <span data-i18n="tab_music">Music</span></button>
+<button onclick="switchTab('books',this)">📚 <span data-i18n="tab_books">Books</span></button>
+<button onclick="switchTab('software',this)">💾 <span data-i18n="tab_software">Software</span></button>
+<button onclick="switchTab('quran',this)">📖 <span data-i18n="tab_quran">Quran</span></button>
+<button onclick="switchTab('hadith',this)">📜 <span data-i18n="tab_hadith">Hadith</span></button>
+<button onclick="switchTab('summary',this)">🪪 <span data-i18n="tab_summary">Summary</span></button>
+</div>
+<div class="tab-content active" id="tab-movies">
+<div class="search-box">
+<input type="text" id="movieQuery" data-i18n-ph="search_movie" onkeydown="if(event.key==='Enter')searchMovies()">
+<button onclick="searchMovies()" data-i18n="search">Search</button>
+</div>
+<div id="movieResults"></div>
+<div id="serverResults" style="display:none"></div>
+</div>
+<div class="tab-content" id="tab-music">
+<div class="search-box">
+<input type="text" id="musicQuery" data-i18n-ph="search_music" onkeydown="if(event.key==='Enter')searchMusic()">
+<button onclick="searchMusic()" data-i18n="search">Search</button>
+</div>
+<div id="musicResults"></div>
+</div>
+<div class="tab-content" id="tab-books">
+<div class="search-box">
+<input type="text" id="bookQuery" data-i18n-ph="search_book" onkeydown="if(event.key==='Enter')searchBooks()">
+<button onclick="searchBooks()" data-i18n="search">Search</button>
+</div>
+<div id="bookResults"></div>
+</div>
+<div class="tab-content" id="tab-software">
+<div class="search-box" style="margin-bottom:12px">
+<input type="text" id="swQuery" data-i18n-ph="search_software" placeholder="ابحث عن برنامج... AI, Photoshop..." oninput="filterSoftware()" style="flex:1">
+<button onclick="filterSoftware()" data-i18n="search">بحث</button>
+</div>
+<div class="sw-filter" id="swFilter">
+<button class="active" onclick="setSwFilter('all',this)" data-i18n="sw_all">All</button>
+<button onclick="setSwFilter('free',this)" data-i18n="sw_free">Free</button>
+<button onclick="setSwFilter('paid',this)" data-i18n="sw_paid">Paid</button>
+<button onclick="setSwFilter('ai',this)" data-i18n="tab_ai">AI</button>
+<button onclick="setSwFilter('architecture',this)" data-i18n="sw_arch">Architecture</button>
+<button onclick="setSwFilter('3d',this)" data-i18n="sw_3d">3D</button>
+<button onclick="setSwFilter('design',this)" data-i18n="sw_design">Design</button>
+<button onclick="setSwFilter('video',this)" data-i18n="sw_video">Video</button>
+<button onclick="setSwFilter('audio',this)" data-i18n="sw_audio">Audio</button>
+<button onclick="setSwFilter('office',this)" data-i18n="sw_office">Office</button>
+<button onclick="setSwFilter('programming',this)" data-i18n="sw_prog">Programming</button>
+<button onclick="setSwFilter('render',this)" data-i18n="sw_render">Render</button>
+<button onclick="setSwFilter('utility',this)" data-i18n="sw_util">Utility</button>
+</div>
+<div id="softwareResults"></div>
+</div>
+<div class="tab-content" id="tab-quran">
+<div class="search-box" style="margin-bottom:12px">
+<input type="text" id="quranSearch" data-i18n-ph="search_quran" placeholder="ابحث عن سورة... الفاتحة، البقرة..." oninput="filterQuran()" style="flex:1">
+<button onclick="filterQuran()" data-i18n="search">بحث</button>
+</div>
+<div class="settings-row" style="margin-bottom:15px;flex-wrap:wrap">
+<label style="white-space:nowrap;font-weight:bold" data-i18n="reciter">Reciter:</label>
+<select id="quranReciter" onchange="loadSurahs()" style="max-width:220px"></select>
+<label style="white-space:nowrap">تكرار الحفظ:</label>
+<select id="quranRepeat" style="max-width:120px"><option value="1">مرة واحدة</option><option value="3">3 مرات</option><option value="5">5 مرات</option><option value="10">10 مرات</option><option value="loop">مستمر</option></select>
+<label>ترجمة:</label>
+<select id="quranLang" onchange="loadSurahAyahs(currentSurah, this.value)" style="max-width:140px"><option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option><option value="ber">ⵜⴰⵎⴰⵣⵉⵖⵜ</option></select>
+</div>
+<div id="quranAudioBox" style="display:none;margin-bottom:15px;padding:14px;background:var(--glass);border:1px solid var(--border);border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,0.3)">
+<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+<span id="nowPlaying" style="flex:1;font-size:13px;color:var(--accent);font-weight:bold">—</span>
+<button onclick="stopAyah()" style="padding:6px 12px;border:1px solid var(--accent2);border-radius:8px;background:var(--accent2);color:#fff;cursor:pointer;font-size:12px">⏹️ إيقاف</button>
+<button onclick="prevAyah()" style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--glass);color:var(--text);cursor:pointer">⏮️</button>
+<button onclick="nextAyah()" style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--glass);color:var(--text);cursor:pointer">⏭️</button>
+<button onclick="exitQuranMode()" style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,0.1);color:var(--text);cursor:pointer">✖️ خروج</button>
+</div>
+<audio id="quranAudio" controls style="width:100%;border-radius:8px"></audio>
+<div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:6px">💡 انقر على أي آية في القائمة للبدء بتكرارها مباشرة - يمكنك تغيير الآية أو السورة في أي وقت</div>
+<div id="quranAyahsBox" style="margin-top:10px;max-height:380px;overflow-y:auto;scroll-behavior:smooth"></div>
+</div>
+<div id="quranResults" class="quran-grid"></div>
+</div>
+<div class="tab-content" id="tab-hadith">
+<div class="search-box">
+<input type="text" id="hadithQuery" data-i18n-ph="search_hadith" onkeydown="if(event.key==='Enter')searchHadith()">
+<button onclick="searchHadith()" data-i18n="search">Search</button>
+</div>
+<div class="settings-row" style="gap:6px;margin-bottom:12px">
+<select id="hadithCollection" onchange="searchHadith()"><option value="all">الكل</option><option value="البخاري">البخاري</option><option value="مسلم">مسلم</option></select>
+</div>
+<div id="hadithResults"></div>
+</div>
+<div class="tab-content" id="tab-summary">
+<div id="summaryBox"><div class="empty">اختر أي عنصر واضغط "بطاقة تعريفية" لعرض ملخصه. يشمل نوع السورة (مكية/مدنية) وسبب النزول والتفسير وشرح الحديث ونوع الملف.</div></div>
+</div>
+</div>
+<div id="downloadBar">
+<div class="dl-info">
+<span class="dl-title" id="dlTitle" data-i18n="downloading">Downloading...</span>
+<span class="dl-status" id="dlStatus" data-i18n="starting">Starting...</span>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="dlProgress"></div></div>
+<div class="dl-details">
+<span id="dlSize">0 / 0 MB</span>
+<span id="dlSpeed">0 MB/s</span>
+<span id="dlEta">ETA: --:--</span>
+<span id="dlPath"></span>
+</div>
+<div class="dl-actions">
+<button class="btn-primary" onclick="pauseDownload()" data-i18n="pause">Pause</button>
+<button class="btn-success" onclick="resumeDownload()" data-i18n="resume">Resume</button>
+<button class="btn-danger" onclick="cancelDownload()" data-i18n="cancel">Cancel</button>
+</div>
+</div>
+<div class="modal-overlay" id="qualityModal">
+<div class="modal glass">
+<h3 data-i18n="select_quality">Select Quality</h3>
+<div class="quality-options">
+<input type="radio" name="quality" id="q-best" value="best" checked><label for="q-best" data-i18n="q_best">Best</label>
+<input type="radio" name="quality" id="q-1080" value="1080p"><label for="q-1080">1080p</label>
+<input type="radio" name="quality" id="q-720" value="720p"><label for="q-720">720p</label>
+<input type="radio" name="quality" id="q-480" value="480p"><label for="q-480">480p</label>
+<input type="radio" name="quality" id="q-mp3" value="mp3"><label for="q-mp3" data-i18n="q_mp3">MP3 Audio</label>
+</div>
+<button class="btn-primary" onclick="startDownload()" style="width:100%" data-i18n="download">Download</button>
+<button class="btn-secondary" onclick="closeModal('qualityModal')" style="width:100%;margin-top:8px" data-i18n="cancel">Cancel</button>
+</div>
+</div>
+<div class="modal-overlay" id="settingsModal">
+<div class="modal glass">
+<h3 data-i18n="settings">Settings</h3>
+<label style="font-weight:bold;display:block;margin-bottom:6px" data-i18n="save_dir">Download Directory:</label>
+<div class="settings-row">
+<input type="text" id="saveDirInput" data-i18n-ph="enter_path">
+<button onclick="changeSaveDir()" data-i18n="save">Save</button>
+</div>
+<label style="font-weight:bold;display:block;margin-bottom:6px" data-i18n="current_dir">Current Directory:</label>
+<p id="currentSaveDir" style="padding:10px;background:rgba(255,255,255,0.05);border-radius:8px;font-size:13px;word-break:break-all"></p>
+<button class="btn-secondary" onclick="closeModal('settingsModal')" style="width:100%;margin-top:15px" data-i18n="close">Close</button>
+</div>
+</div>
+<script>
+var LANG={ar:{app_title:"Universal Downloader Pro",app_sub:"أفلام، موسيقى، كتب، برامج و قرآن",enter_key:"أدخل مفتاح API",login:"تسجيل الدخول",settings:"الإعدادات",dark:"داكن",light:"فاتح",logout:"خروج",tab_movies:"أفلام",tab_music:"موسيقى",tab_books:"كتب",tab_software:"برامج",tab_quran:"قرآن",tab_hadith:"أحاديث",tab_summary:"بطاقة تعريفية",tab_ai:"ذكاء اصطناعي",tab_compare:"مقارنة",search_movie:"ابحث عن فيلم...",search_music:"ابحث عن أغنية...",search_book:"ابحث عن كتاب...",search:"بحث",sw_all:"الكل",sw_free:"مجاني",sw_paid:"مدفوع",sw_arch:"عمارة",sw_3d:"ثلاثي الأبعاد",sw_design:"تصميم",sw_video:"فيديو",sw_audio:"صوت",sw_office:"مكتبية",sw_prog:"برمجة",sw_render:"رندر",sw_util:"أدوات",reciter:"القارئ:",downloading:"جاري التحميل...",starting:"جاري البدء...",pause:"إيقاف مؤقت",resume:"استئناف",cancel:"إلغاء",select_quality:"اختر الجودة",q_best:"الأفضل",q_mp3:"صوت MP3",download:"تحميل",save_dir:"مجلد الحفظ:",enter_path:"أدخل مسار الحفظ...",save:"حفظ",current_dir:"المجلد الحالي:",close:"إغلاق",servers_for:"سيرفرات لـ:",no_servers:"لم يتم العثور على سيرفرات. جرب فيلم آخر.",title:"العنوان",format:"الصيغة",quality:"الجودة",size:"الحجم",duration:"المدة",action:"إجراء",find_servers:"بحث السيرفرات",no_results:"لا توجد نتائج",error:"خطأ",director:"المخرج:",cast:"طاقم التمثيل:",duration_lbl:"المدة:",by:"بواسطة:",author:"المؤلف:",date:"التاريخ:",downloaded:"تم التحميل!",complete:"اكتمل!",error_prefix:"خطأ: ",platforms:"المنصات:",replaces:"يحل محل:",software_error:"خطأ في تحميل البرامج",no_software:"لم يتم العثور على برامج",quran_error:"خطأ في تحميل القرآن",ayahs:"آيات",meccan:"مكية",medinan:"مدنية",free_alt:"البديل المجاني:",paid_lbl:"مدفوع -",no_cmp:"لا توجد مقارنات",cmp_error:"خطأ"},en:{app_title:"Universal Downloader Pro",app_sub:"Movies, Music, Books, Software & Quran",enter_key:"Enter API Key",login:"Login",settings:"Settings",dark:"Dark",light:"Light",logout:"Logout",tab_movies:"Movies",tab_music:"Music",tab_books:"Books",tab_software:"Software",tab_quran:"Quran",tab_compare:"Compare",search_movie:"Search for a movie...",search_music:"Search for music...",search_book:"Search for books...",search:"Search",sw_all:"All",sw_free:"Free",sw_paid:"Paid",sw_arch:"Architecture",sw_3d:"3D",sw_design:"Design",sw_video:"Video",sw_audio:"Audio",sw_office:"Office",sw_prog:"Programming",sw_render:"Render",sw_util:"Utility",reciter:"Reciter:",downloading:"Downloading...",starting:"Starting...",pause:"Pause",resume:"Resume",cancel:"Cancel",select_quality:"Select Quality",q_best:"Best",q_mp3:"MP3 Audio",download:"Download",save_dir:"Download Directory:",enter_path:"Enter save path...",save:"Save",current_dir:"Current Directory:",close:"Close",servers_for:"Servers for:",no_servers:"No servers found. Try another movie.",title:"Title",format:"Format",quality:"Quality",size:"Size",duration:"Duration",action:"Action",find_servers:"Find Servers",no_results:"No results",error:"Error",director:"Director:",cast:"Cast:",duration_lbl:"Duration:",by:"By",author:"Author:",date:"Date:",downloaded:"Downloaded!",complete:"Complete!",error_prefix:"Error: ",platforms:"Platforms:",replaces:"Replaces:",software_error:"Error loading software",no_software:"No software found",quran_error:"Error loading Quran",ayahs:"ayahs",meccan:"Meccan",medinan:"Medinan",free_alt:"Free alternative:",paid_lbl:"Paid -",no_cmp:"No comparisons found",cmp_error:"Error"},fr:{app_title:"Universal Downloader Pro",app_sub:"Films, Musique, Livres, Logiciels & Coran",enter_key:"Clé API",login:"Connexion",settings:"Paramètres",dark:"Sombre",light:"Clair",logout:"Déconnexion",tab_movies:"Films",tab_music:"Musique",tab_books:"Livres",tab_software:"Logiciels",tab_quran:"Coran",tab_compare:"Comparer",search_movie:"Rechercher un film...",search_music:"Rechercher de la musique...",search_book:"Rechercher des livres...",search:"Rechercher",sw_all:"Tout",sw_free:"Gratuit",sw_paid:"Payant",sw_arch:"Architecture",sw_3d:"3D",sw_design:"Design",sw_video:"Vidéo",sw_audio:"Audio",sw_office:"Bureau",sw_prog:"Programmation",sw_render:"Rendu",sw_util:"Utilitaire",reciter:"Récitateur:",downloading:"Téléchargement...",starting:"Démarrage...",pause:"Pause",resume:"Reprendre",cancel:"Annuler",select_quality:"Choisir la qualité",q_best:"Meilleur",q_mp3:"Audio MP3",download:"Télécharger",save_dir:"Répertoire de téléchargement:",enter_path:"Entrer le chemin...",save:"Enregistrer",current_dir:"Répertoire actuel:",close:"Fermer",servers_for:"Serveurs pour:",no_servers:"Aucun serveur trouvé. Essayez un autre film.",title:"Titre",format:"Format",quality:"Qualité",size:"Taille",duration:"Durée",action:"Action",find_servers:"Rechercher les serveurs",no_results:"Aucun résultat",error:"Erreur",director:"Réalisateur:",cast:"Distribution:",duration_lbl:"Durée:",by:"par",author:"Auteur:",date:"Date:",downloaded:"Téléchargé!",complete:"Terminé!",error_prefix:"Erreur: ",platforms:"Plateformes:",replaces:"Remplace:",software_error:"Erreur de chargement",no_software:"Aucun logiciel trouvé",quran_error:"Erreur de chargement du Coran",ayahs:"versets",meccan:"Mecquoise",medinan:"Médinoise",free_alt:"Alternative gratuite:",paid_lbl:"Payant -",no_cmp:"Aucune comparaison",cmp_error:"Erreur"}};
+var ST={token:null,dlId:null,dlPoll:null,pendingUrl:'',swData:[],swFilter:'all',lang:'ar',hadithData:[]};
+if(LANG.ar){LANG.ar.search_hadith="ابحث عن حديث...";LANG.ar.tab_hadith=LANG.ar.tab_hadith||"أحاديث";LANG.ar.tab_summary=LANG.ar.tab_summary||"بطاقة تعريفية";LANG.ar.tab_ai=LANG.ar.tab_ai||"ذكاء اصطناعي";LANG.ar.hadith_error="خطأ في الأحاديث";LANG.ar.summary="ملخص"}
+if(LANG.en){LANG.en.search_hadith="Search hadith...";LANG.en.tab_hadith="Hadith";LANG.en.tab_summary="Summary";LANG.en.tab_ai="AI";LANG.en.hadith_error="Hadith error"}
+if(LANG.fr){LANG.fr.search_hadith="Chercher hadith...";LANG.fr.tab_hadith="Hadith";LANG.fr.tab_summary="Résumé";LANG.fr.tab_ai="IA"}
+LANG.ber={app_title:"Universal Downloader Pro",app_sub:"Isura, Muzigga, Idlisen, Isnasen, Leqran d Lḥadit",enter_key:"Ssekcem asaru n API",login:"Kecm",settings:"Iɣewwaren",dark:"Tallast",light:"Tafat",logout:"Tuffɣa",tab_movies:"ⴰⵙⵉⵔⴰ",tab_music:"ⴰⵥⴰⵡⴰⵏ",tab_books:"ⵉⴷⵍⵉⵙⵏ",tab_software:"ⵉⵙⵏⵙⵏ",tab_quran:"ⵍⴻⵇⵔⴰⵏ",tab_hadith:"ⵍⵃⴰⴷⵉⵜ",tab_summary:"ⵜⴰⴽⴰⵕⴹⴰ",tab_ai:"ⵜⵓⵙⵙⵏⴰ ⵜⴰⴳⵍⴷⴰⵏⵜ",search_movie:"Nadi asaru...",search_music:"Nadi aẓawan...",search_book:"Nadi adlis...",search_hadith:"Nadi lḥadit...",search:"Nadi",sw_all:"Ak",sw_free:"Baṭel",sw_paid:"S timent",sw_arch:"Tasegda",sw_3d:"3D",sw_design:"Amsuneɣ",sw_video:"Avidyun",sw_audio:"Amesli",sw_office:"Asɣim",sw_prog:"Asiheḍ",sw_render:"Tasɣelt",sw_util:"Allalen",reciter:"Amɣar:",downloading:"Asider...",starting:"Abdu...",pause:"Asbded",resume:"Asnulfu",cancel:"Sefsex",select_quality:"Fren tasna",q_best:"Ameylal",q_mp3:"MP3",download:"Sader",save_dir:"Aɣadir:",enter_path:"Ssekcem abrid...",save:"Sekles",current_dir:"Aɣadir amiran:",close:"Mdel",servers_for:"Ineggura i:",no_servers:"Ulac ineggura.",title:"Azwel",format:"Amasal",quality:"Tasna",size:"Teɣzi",duration:"Akud",action:"Tigawt",find_servers:"Nadi ineggura",no_results:"Ulac igemda",error:"Tuccḍa",director:"Aneɣlaf:",cast:"Icekkan:",duration_lbl:"Akud:",by:"sɣur:",author:"Amaslan:",date:"Azemz:",downloaded:"Yettwasader!",complete:"Yemmed!",error_prefix:"Tuccḍa: ",platforms:"Iɣeṛṛan:",replaces:"Yeṭṭak asedger:",software_error:"Tuccḍa isnasen",no_software:"Ulac isnasen",quran_error:"Tuccḍa Leqran",ayahs:"tayah",meccan:"Mekkith",medinan:"Medinith",free_alt:"Asedger baṭel:",paid_lbl:"S timent -",no_cmp:"Ulac",cmp_error:"Tuccḍa",hadith_error:"Tuccḍa lḥadit",summary:"Agzul"};
+LANG.de={app_title:"Universal Downloader Pro",app_sub:"Filme, Musik, Bücher, Software & Koran",enter_key:"API-Schlüssel eingeben",login:"Anmelden",settings:"Einstellungen",dark:"Dunkel",light:"Hell",logout:"Abmelden",tab_movies:"Filme",tab_music:"Musik",tab_books:"Bücher",tab_software:"Software",tab_quran:"Koran",tab_hadith:"Hadith",tab_summary:"Karte",tab_ai:"KI",search_movie:"Film suchen...",search_music:"Musik suchen...",search_book:"Buch suchen...",search_hadith:"Hadith suchen...",search:"Suchen",sw_all:"Alle",sw_free:"Kostenlos",sw_paid:"Bezahlt",sw_arch:"Architektur",sw_3d:"3D",sw_design:"Design",sw_video:"Video",sw_audio:"Audio",sw_office:"Office",sw_prog:"Programmierung",sw_render:"Render",sw_util:"Werkzeuge",reciter:"Rezitator:",downloading:"Lädt...",starting:"Startet...",pause:"Pause",resume:"Fortsetzen",cancel:"Abbrechen",select_quality:"Qualität wählen",q_best:"Beste",q_mp3:"MP3 Audio",download:"Herunterladen",save_dir:"Verzeichnis:",enter_path:"Pfad eingeben...",save:"Speichern",current_dir:"Aktuell:",close:"Schließen",servers_for:"Server für:",no_servers:"Keine Server.",title:"Titel",format:"Format",quality:"Qualität",size:"Größe",duration:"Dauer",action:"Aktion",find_servers:"Server suchen",no_results:"Keine Ergebnisse",error:"Fehler",director:"Regisseur:",cast:"Besetzung:",duration_lbl:"Dauer:",by:"Von:",author:"Autor:",date:"Datum:",downloaded:"Heruntergeladen!",complete:"Fertig!",error_prefix:"Fehler: ",platforms:"Plattformen:",replaces:"Ersetzt:",software_error:"Softwarefehler",no_software:"Keine Software",quran_error:"Koranfehler",ayahs:"Verse",meccan:"Mekkanisch",medinan:"Medinensisch",free_alt:"Kostenlose Alt:",paid_lbl:"Bezahlt -",no_cmp:"Kein Vergleich",cmp_error:"Fehler",hadith_error:"Hadith Fehler",summary:"Zusammenfassung"};
+LANG.es={app_title:"Universal Downloader Pro",app_sub:"Películas, Música, Libros, Software y Corán",enter_key:"Clave API",login:"Entrar",settings:"Ajustes",dark:"Oscuro",light:"Claro",logout:"Salir",tab_movies:"Películas",tab_music:"Música",tab_books:"Libros",tab_software:"Software",tab_quran:"Corán",tab_hadith:"Hadiz",tab_summary:"Ficha",tab_ai:"IA",search_movie:"Buscar película...",search_music:"Buscar música...",search_book:"Buscar libro...",search_hadith:"Buscar hadiz...",search:"Buscar",sw_all:"Todo",sw_free:"Gratis",sw_paid:"Pago",sw_arch:"Arquitectura",sw_3d:"3D",sw_design:"Diseño",sw_video:"Video",sw_audio:"Audio",sw_office:"Oficina",sw_prog:"Programación",sw_render:"Render",sw_util:"Utilidad",reciter:"Recitador:",downloading:"Descargando...",starting:"Iniciando...",pause:"Pausa",resume:"Reanudar",cancel:"Cancelar",select_quality:"Calidad",q_best:"Mejor",q_mp3:"MP3",download:"Descargar",save_dir:"Carpeta:",enter_path:"Ruta...",save:"Guardar",current_dir:"Actual:",close:"Cerrar",servers_for:"Servidores para:",no_servers:"Sin servidores.",title:"Título",format:"Formato",quality:"Calidad",size:"Tamaño",duration:"Duración",action:"Acción",find_servers:"Buscar servidores",no_results:"Sin resultados",error:"Error",director:"Director:",cast:"Reparto:",duration_lbl:"Duración:",by:"Por:",author:"Autor:",date:"Fecha:",downloaded:"¡Descargado!",complete:"¡Completo!",error_prefix:"Error: ",platforms:"Plataformas:",replaces:"Reemplaza:",software_error:"Error software",no_software:"Sin software",quran_error:"Error Corán",ayahs:"versos",meccan:"Meca",medinan:"Medina",free_alt:"Alt gratis:",paid_lbl:"Pago -",no_cmp:"Sin comparación",cmp_error:"Error",hadith_error:"Error hadiz",summary:"Resumen"};
+LANG.tr={app_title:"Universal Downloader Pro",app_sub:"Filmler, Müzik, Kitaplar, Yazılım ve Kuran",enter_key:"API Anahtarı",login:"Giriş",settings:"Ayarlar",dark:"Karanlık",light:"Aydınlık",logout:"Çıkış",tab_movies:"Filmler",tab_music:"Müzik",tab_books:"Kitaplar",tab_software:"Yazılım",tab_quran:"Kuran",tab_hadith:"Hadis",tab_summary:"Kart",tab_ai:"YZ",search_movie:"Film ara...",search_music:"Müzik ara...",search_book:"Kitap ara...",search_hadith:"Hadis ara...",search:"Ara",sw_all:"Tümü",sw_free:"Ücretsiz",sw_paid:"Ücretli",sw_arch:"Mimari",sw_3d:"3D",sw_design:"Tasarım",sw_video:"Video",sw_audio:"Ses",sw_office:"Ofis",sw_prog:"Programlama",sw_render:"Render",sw_util:"Araç",reciter:"Okuyucu:",downloading:"İndiriliyor...",starting:"Başlıyor...",pause:"Duraklat",resume:"Devam",cancel:"İptal",select_quality:"Kalite",q_best:"En iyi",q_mp3:"MP3",download:"İndir",save_dir:"Klasör:",enter_path:"Yol...",save:"Kaydet",current_dir:"Mevcut:",close:"Kapat",servers_for:"Sunucular:",no_servers:"Sunucu yok.",title:"Başlık",format:"Biçim",quality:"Kalite",size:"Boyut",duration:"Süre",action:"İşlem",find_servers:"Sunucuları bul",no_results:"Sonuç yok",error:"Hata",director:"Yönetmen:",cast:"Oyuncular:",duration_lbl:"Süre:",by:"Yazan:",author:"Yazar:",date:"Tarih:",downloaded:"İndirildi!",complete:"Tamam!",error_prefix:"Hata: ",platforms:"Platformlar:",replaces:"Yerine:",software_error:"Yazılım hatası",no_software:"Yazılım yok",quran_error:"Kuran hatası",ayahs:"ayet",meccan:"Mekki",medinan:"Medeni",free_alt:"Ücretsiz Alt:",paid_lbl:"Ücretli -",no_cmp:"Karşılaştırma yok",cmp_error:"Hata",hadith_error:"Hadis hatası",summary:"Özet"};
+
+// إضافة مفاتيح بحث إضافية
+if(LANG.ar){LANG.ar.search_software="ابحث عن برنامج...";LANG.ar.search_quran="ابحث عن سورة...";LANG.ar.search_hadith=LANG.ar.search_hadith||"ابحث عن حديث..."}
+if(LANG.en){LANG.en.search_software="Search program...";LANG.en.search_quran="Search surah..."}
+if(LANG.fr){LANG.fr.search_software="Chercher logiciel...";LANG.fr.search_quran="Chercher sourate..."}
+if(LANG.ber){LANG.ber.search_software="Nadi asnusen...";LANG.ber.search_quran="Nadi tasurtt...";LANG.ber.search_hadith="Nadi lḥadit..."}
+if(LANG.de){LANG.de.search_software="Programm suchen...";LANG.de.search_quran="Sure suchen..."}
+if(LANG.es){LANG.es.search_software="Buscar programa...";LANG.es.search_quran="Buscar sura..."}
+if(LANG.tr){LANG.tr.search_software="Program ara...";LANG.tr.search_quran="Sure ara..."}
+if(LANG.ur){LANG.ur.search_software="پروگرام تلاش...";LANG.ur.search_quran="سورہ تلاش..."}
+LANG.ur={app_title:"Universal Downloader Pro",app_sub:"فلمیں، موسیقی، کتابیں، سافٹ ویئر اور قرآن",enter_key:"API کلید",login:"لاگ ان",settings:"ترتیبات",dark:"تاریک",light:"روشنی",logout:"خروج",tab_movies:"فلمیں",tab_music:"موسیقی",tab_books:"کتابیں",tab_software:"سافٹ ویئر",tab_quran:"قرآن",tab_hadith:"حدیث",tab_summary:"کارڈ",tab_ai:"AI",search_movie:"فلم تلاش...",search_music:"موسیقی تلاش...",search_book:"کتاب تلاش...",search_hadith:"حدیث تلاش...",search:"تلاش",sw_all:"سب",sw_free:"مفت",sw_paid:"معاوضہ",sw_arch:"آرکیٹیکچر",sw_3d:"3D",sw_design:"ڈیزائن",sw_video:"ویڈیو",sw_audio:"آڈیو",sw_office:"آفس",sw_prog:"پروگرامنگ",sw_render:"رینڈر",sw_util:"ٹولز",reciter:"قاری:",downloading:"ڈاؤن لوڈ...",starting:"شروع...",pause:"روک",resume:"جاری",cancel:"منسوخ",select_quality:"کوالٹی",q_best:"بہترین",q_mp3:"MP3",download:"ڈاؤن لوڈ",save_dir:"فولڈر:",enter_path:"راستہ...",save:"محفوظ",current_dir:"موجودہ:",close:"بند",servers_for:"سرور:",no_servers:"کوئی سرور نہیں",title:"عنوان",format:"فارمیٹ",quality:"کوالٹی",size:"سائز",duration:"دورانیہ",action:"عمل",find_servers:"سرور تلاش",no_results:"کوئی نتیجہ نہیں",error:"خرابی",director:"ہدایتکار:",cast:"کاسٹ:",duration_lbl:"دورانیہ:",by:"منجانب:",author:"مصنف:",date:"تاریخ:",downloaded:"ڈاؤن لوڈ ہوگیا!",complete:"مکمل!",error_prefix:"خرابی: ",platforms:"پلیٹ فارم:",replaces:"متبادل:",software_error:"سافٹ ویئر خرابی",no_software:"کوئی سافٹ ویئر نہیں",quran_error:"قرآن خرابی",ayahs:"آیات",meccan:"مکی",medinan:"مدنی",free_alt:"مفت متبادل:",paid_lbl:"معاوضہ -",no_cmp:"کوئی موازنہ نہیں",cmp_error:"خرابی",hadith_error:"حدیث خرابی",summary:"خلاصہ"};
+function $(id){return document.getElementById(id)}
+function t(k){var L=LANG[ST.lang]||LANG.ar;return L[k]||LANG.en[k]||k}
+function applyLang(){document.querySelectorAll('[data-i18n]').forEach(function(el){el.textContent=t(el.getAttribute('data-i18n'))});document.querySelectorAll('[data-i18n-ph]').forEach(function(el){el.placeholder=t(el.getAttribute('data-i18n-ph'))});document.title=t('app_title')}
+function setLang(l){ST.lang=l;localStorage.setItem('lang',l);applyLang();if($('quranReciter').options.length>0)loadSurahs();if($('tab-summary').classList.contains('active')){}if($('tab-software').classList.contains('active')&&ST.swData.length)filterSoftware()}
+async function api(url,opts){try{var r=await fetch(url,Object.assign({headers:{'Content-Type':'application/json'}},opts||{}));var d=await r.json();if(!r.ok)throw new Error(d.detail||'Error');return d}catch(e){throw e}}
+function showLogin(){$('loginScreen').style.display='flex';$('mainApp').style.display='none'}
+function showMain(){$('loginScreen').style.display='none';$('mainApp').style.display='block';loadSettings();loadSoftware()}
+function toggleTheme(){var b=document.body;if(b.getAttribute('data-theme')==='light'){b.removeAttribute('data-theme');$('themeBtn').textContent=t('dark')}else{b.setAttribute('data-theme','light');$('themeBtn').textContent=t('light')}}
+async function doLogin(){var key=$('loginKey').value.trim();if(!key){$('loginError').style.display='block';$('loginError').textContent=t('enter_key');return}try{$('loginBtn').textContent='...';$('loginBtn').disabled=true;var d=await api('/api/auth/login',{method:'POST',body:JSON.stringify({api_key:key})});ST.token=d.token;showMain();applyLang()}catch(e){$('loginError').style.display='block';$('loginError').textContent=e.message}finally{$('loginBtn').textContent=t('login');$('loginBtn').disabled=false}}
+function doLogout(){ST.token=null;showLogin()}
+var currentSurah=1;
+function switchTab(tab,btn){document.querySelectorAll('.tabs button').forEach(function(b){b.classList.remove('active')});if(btn)btn.classList.add('active');document.querySelectorAll('.tab-content').forEach(function(t2){t2.classList.toggle('active',t2.id==='tab-'+tab)});if(tab==='software'&&!ST.swData.length)loadSoftware();if(tab==='quran')loadSurahs();if(tab==='hadith')searchHadith();if(tab==='summary'){} }
+async function searchMovies(){var q=$('movieQuery').value.trim();if(!q||!ST.token)return;$('movieResults').innerHTML='<div class="loading"><div class="spinner"></div></div>';$('serverResults').style.display='none';try{var d=await api('/api/movies/search',{method:'POST',body:JSON.stringify({query:q,token:ST.token})});var html='';d.candidates.forEach(function(m){html+='<div class="card"><div class="card-header">';if(m.poster_url){html+='<img class="card-poster" src="'+m.poster_url+'" onerror="this.style.display=\'none\'">'}else{html+='<div class="card-poster">'+t('tab_movies')+'</div>'}html+='<div class="card-info"><h3>'+m.title+' ('+m.year+')</h3>';if(m.director&&m.director!=='N/A')html+='<p>'+t('director')+' '+m.director+'</p>';if(m.cast&&m.cast!=='N/A')html+='<p>'+t('cast')+' '+m.cast+'</p>';if(m.synopsis)html+='<p>'+m.synopsis.substring(0,200)+'</p>';html+='<div class="card-actions"><button class="btn-primary" onclick="searchServers(\''+m.title.replace(/'/g,"\\'")+'\',\''+m.year+'\',\''+(m.tmdb_id||'')+'\')">'+t('find_servers')+'</button><button class="btn-secondary" onclick="showSummary(\'movie\',\''+m.title.replace(/'/g,"\\'")+'\')">بطاقة</button></div></div></div></div>'});if(!d.candidates.length)html='<div class="empty">'+t('no_results')+'</div>';$('movieResults').innerHTML=html}catch(e){$('movieResults').innerHTML='<div class="empty">'+t('error')+': '+e.message+'</div>'}}
+async function searchServers(title,year,tmdb_id){$('serverResults').style.display='block';$('serverResults').innerHTML='<div class="loading"><div class="spinner"></div></div>';try{var d=await api('/api/movies/servers',{method:'POST',body:JSON.stringify({title:title,year:year,tmdb_id:tmdb_id||'',token:ST.token})});var html='<h3 style="margin-bottom:10px;color:var(--accent)">'+t('servers_for')+' '+title+'</h3>';if(!d.servers.length){html+='<div class="empty">'+t('no_servers')+'</div>'}else{html+='<table class="server-table"><thead><tr><th>'+t('title')+'</th><th>'+t('format')+'</th><th>'+t('quality')+'</th><th>'+t('size')+'</th><th>'+t('duration')+'</th><th>'+t('action')+'</th></tr></thead><tbody>';d.servers.forEach(function(s){html+='<tr><td>'+s.title+'</td><td>'+(s.ext||'mp4')+'</td><td>'+(s.resolution||'HD')+'</td><td>'+(s.size||'N/A')+'</td><td>'+(s.duration||'N/A')+'</td><td><button class="btn-primary" onclick="openQuality(\''+s.url.replace(/'/g,"\\'")+'\')">'+t('download')+'</button></td></tr>'});html+='</tbody></table>'}$('serverResults').innerHTML=html}catch(e){$('serverResults').innerHTML='<div class="empty">'+t('error')+': '+e.message+'</div>'}}
+function openQuality(url){ST.pendingUrl=url;$('qualityModal').classList.add('show')}
+function closeModal(id){$(id).classList.remove('show')}
+async function startDownload(){var q=document.querySelector('input[name="quality"]:checked').value;closeModal('qualityModal');if(!ST.pendingUrl)return;try{var d=await api('/api/download/start',{method:'POST',body:JSON.stringify({url:ST.pendingUrl,quality:q,token:ST.token,save_dir:''})});ST.dlId=d.download_id;startDlPoll();$('downloadBar').style.display='block'}catch(e){alert(t('error')+': '+e.message)}}
+function startDlPoll(){if(ST.dlPoll)clearInterval(ST.dlPoll);ST.dlPoll=setInterval(pollDownload,1000)}
+async function pollDownload(){if(!ST.dlId)return;try{var d=await api('/api/download/'+ST.dlId+'/progress');$('dlTitle').textContent=d.title||t('downloading');$('dlStatus').textContent=d.status;$('dlProgress').style.width=d.percent+'%';var tMB=(d.total/(1024*1024)).toFixed(1);var dMB=(d.downloaded/(1024*1024)).toFixed(1);$('dlSize').textContent=dMB+' / '+tMB+' MB';$('dlSpeed').textContent=d.speed?(d.speed/(1024*1024)).toFixed(1)+' MB/s':'...';$('dlEta').textContent='ETA: '+fmtEta(d.eta);$('dlPath').textContent=d.save_dir||'';if(d.status==='completed'||d.status==='error'||d.status==='cancelled'){clearInterval(ST.dlPoll);ST.dlPoll=null;if(d.status==='completed')$('dlStatus').textContent=t('complete');if(d.status==='error')$('dlStatus').textContent=t('error_prefix')+d.error}}catch(e){}}
+function fmtEta(s){if(!s||s<=0)return'--:--';var m=Math.floor(s/60);var sec=s%60;return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0')}
+async function pauseDownload(){if(!ST.dlId)return;try{await api('/api/download/pause',{method:'POST',body:JSON.stringify({download_id:ST.dlId,token:ST.token})});$('dlStatus').textContent=t('pause')}catch(e){}}
+async function resumeDownload(){if(!ST.dlId)return;try{await api('/api/download/resume',{method:'POST',body:JSON.stringify({download_id:ST.dlId,token:ST.token})});$('dlStatus').textContent=t('resume')}catch(e){}}
+async function cancelDownload(){if(!ST.dlId)return;try{await api('/api/download/cancel',{method:'POST',body:JSON.stringify({download_id:ST.dlId,token:ST.token})});clearInterval(ST.dlPoll);ST.dlPoll=null;$('downloadBar').style.display='none'}catch(e){}}
+async function searchMusic(){var q=$('musicQuery').value.trim();if(!q||!ST.token)return;$('musicResults').innerHTML='<div class="loading"><div class="spinner"></div></div>';try{var d=await api('/api/music/search',{method:'POST',body:JSON.stringify({query:q,token:ST.token})});var html='';d.tracks.forEach(function(t2){html+='<div class="card"><div class="card-info"><h3>'+t2.title+'</h3><p>'+t('duration_lbl')+' '+t2.duration+' | '+t('by')+' '+t2.uploader+'</p><div class="card-actions"><button class="btn-primary" onclick="openQuality(\''+t2.url.replace(/'/g,"\\'")+'\')">'+t('download')+'</button><button class="btn-secondary" onclick="showSummary(\'music\',\''+t2.title.replace(/'/g,"\\'")+'\')">بطاقة</button></div></div></div>'});if(!d.tracks.length)html='<div class="empty">'+t('no_results')+'</div>';$('musicResults').innerHTML=html}catch(e){$('musicResults').innerHTML='<div class="empty">'+t('error')+': '+e.message+'</div>'}}
+function downloadDirect(url){if(!ST.token){alert(t('error')+': No token');return} ST.pendingUrl=url; startDownloadDirect(url);}
+async function startDownloadDirect(url){try{var d=await api('/api/download/start',{method:'POST',body:JSON.stringify({url:url,quality:'best',token:ST.token,save_dir:''})});ST.dlId=d.download_id;startDlPoll();$('downloadBar').style.display='block'}catch(e){alert(t('error_prefix')+e.message)}}
+async function searchBooks(){var q=$('bookQuery').value.trim();if(!q||!ST.token)return;$('bookResults').innerHTML='<div class="loading"><div class="spinner"></div></div>';try{var d=await api('/api/books/search',{method:'POST',body:JSON.stringify({query:q,token:ST.token})});var html='';d.books.forEach(function(b){var typeIcon = b.title.toLowerCase().includes('.pdf')||b.formats.some(f=>f.name==='PDF') ? '📄' : b.title.toLowerCase().includes('.doc') ? '📝' : b.title.toLowerCase().includes('.xls') ? '📊' : '📚'; html+='<div class="card"><div class="card-info"><h3>'+typeIcon+' '+b.title+'</h3><p>'+t('author')+' '+b.author+' | '+t('date')+' '+b.date+'</p><p style="font-size:11px;color:var(--accent2)">نوع الملف: '+(b.formats.map(f=>f.name).join(' / ')||'PDF')+' | المصدر: '+(b.download_url||'').substring(0,40)+'</p><div class="card-actions">';b.formats.forEach(function(f){var icon=f.name==='PDF'?'📄':f.name==='EPUB'?'📖':f.name==='DOCX'?'📝':'📁';html+='<button class="btn-primary" onclick="downloadDirect(\''+f.url.replace(/'/g,"\\'")+'\')" title="تحميل مباشر '+f.name+'">'+icon+' '+f.name+'</button>'});html+='<button class="btn-secondary" onclick="showSummary(\'book\',\''+b.title.replace(/'/g,"\\'")+'\')">🪪 بطاقة</button></div></div></div>'});if(!d.books.length)html='<div class="empty">'+t('no_results')+'</div>';$('bookResults').innerHTML=html}catch(e){$('bookResults').innerHTML='<div class="empty">'+t('error')+': '+e.message+'</div>'}}
+async function loadSoftware(){try{var d=await api('/api/software/list');ST.swData=d.software;filterSoftware()}catch(e){$('softwareResults').innerHTML='<div class="empty">'+t('software_error')+'</div>'}}
+function setSwFilter(f,btn){ST.swFilter=f;document.querySelectorAll('.sw-filter button').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');filterSoftware()}
+function filterSoftware(){var q=(($('swQuery')?$('swQuery').value:'')||'').toLowerCase().trim();var f=ST.swFilter;var qNorm=q.replace(/^ال/,'');var arMap={'ريفيت':'revit','ريفت':'revit','ريفيت':'revit','اوتوكاد':'autocad','أوتوكاد':'autocad','فوتوشوب':'photoshop','اليستريتور':'illustrator','انكسكيب':'inkscape','بلندر':'blender','ارشيكاد':'archicad','لوميون':'lumion','خلاط':'blender','مايكروسوفت':'microsoft','ادوبي':'adobe','ريفيت':'revit','الريفيت':'revit'};var qEn = arMap[q]||arMap[qNorm]||qNorm;var filtered=ST.swData.filter(function(s){var isAI=s.category==='ai';var showCat = (f==='all'||f==='free'||f==='paid') ? true : (s.category===f); if(q && !showCat){ showCat=true; } if(f==='paid'&&s.type!=='paid')return false;if(f==='free'&&s.type==='paid')return false;if(!q && f!=='all'&&f!=='free'&&f!=='paid'&&s.category!==f)return false;if(q){var hay=(s.name+' '+(s.description_ar||'')+' '+(s.description_en||'')+' '+s.category+' '+(s.id||'')).toLowerCase();var hayNorm=hay.replace(/ال/g,'');if(hay.indexOf(q)===-1 && hay.indexOf(qNorm)===-1 && hay.indexOf(qEn)===-1 && hayNorm.indexOf(qNorm)===-1) return false;}return true});var html='';filtered.forEach(function(s){var badge=s.type==='paid'?'<span class="badge-paid">'+(s.price||t('sw_paid'))+'</span>':'<span class="badge-free">'+t('sw_free')+'</span>';html+='<div class="card"><div class="card-info"><h3>'+s.name+' '+badge+'</h3><p>'+s.description_en+'</p><p>'+t('platforms')+' '+(s.platforms||[]).join(', ')+' | '+t('size')+' '+(s.size||'N/A')+'</p>';if(s.alternatives_to&&s.alternatives_to.length)html+='<p>'+t('replaces')+' '+s.alternatives_to.join(', ')+'</p>';html+='<div class="card-actions"><a href="'+s.download_url+'" target="_blank" class="btn-primary" style="text-decoration:none;display:inline-block">'+t('download')+'</a><button class="btn-secondary" onclick="showSummary(\'software\',\''+s.id+'\')">بطاقة</button></div></div></div>'});if(!filtered.length)html='<div class="empty">'+t('no_software')+'</div>';$('softwareResults').innerHTML=html}
+async function loadSurahs(){try{var r=await api('/api/quran/reciters');var sel=$('quranReciter');if(sel.options.length===0){r.reciters.forEach(function(rc){sel.innerHTML+='<option value="'+rc.id+'">'+rc.name_ar+' ('+rc.name_en+')</option>'})}var d=await api('/api/quran/surahs');window._surahsData=d.surahs;var html='';d.surahs.forEach(function(s){var rev = s.revelation==='Makkiyah'? 'مكية':'مدنية';var nameAr=s.name_ar||'';html+='<div class="quran-card" data-search="'+(nameAr+' '+s.name_en).toLowerCase()+'"><div class="num">'+s.number+'</div><div class="name">'+nameAr+' - '+s.name_en+' - '+rev+'</div><div class="ayahs">'+s.ayahs+' '+t('ayahs')+'</div><div class="info">'+rev+'</div><div class="card-actions" style="margin-top:8px"><button class="btn-primary" onclick="downloadSurah('+s.number+')">تحميل</button><button class="btn-secondary" onclick="showSummary(\'quran\',\''+s.number+'\')">بطاقة</button><button class="btn-success" onclick="playQuran('+s.number+')">تشغيل + ترجمة</button></div></div>'});$('quranResults').innerHTML=html}catch(e){$('quranResults').innerHTML='<div class="empty">'+t('quran_error')+'</div>'}}
+function filterQuran(){var q=($('quranSearch').value||'').toLowerCase().trim();var qNorm=q.replace(/^ال/,'');var cards=document.querySelectorAll('#quranResults .quran-card');var c=0;cards.forEach(function(card){var hay=(card.dataset.search||card.querySelector('.name').textContent).toLowerCase();var hayNorm=hay.replace(/ال/g,'');var show=!q||hay.includes(q)||hay.includes(qNorm)||hayNorm.includes(qNorm);card.style.display=show?'block':'none';if(show)c++;});if(q&&c===0){if(!$('quranNoResult')){$('quranResults').insertAdjacentHTML('beforeend','<div id="quranNoResult" class="empty">لا توجد نتائج - جرب بالعربية أو الإنجليزية (الكهف / Al-Kahf / كهف)</div>')} }else{var el=$('quranNoResult');if(el)el.remove();}}
+async function downloadSurah(num){var rec=$('quranReciter').value;try{var d=await api('/api/quran/download',{method:'POST',body:JSON.stringify({surah_number:num,reciter:rec,token:ST.token})});ST.dlId=d.download_id;startDlPoll();$('downloadBar').style.display='block'}catch(e){alert(t('error')+': '+e.message)}}
+// خريطة القراء لصوت الآية (alquran.cloud)
+var AYAH_EDITION={'alafasy':'ar.alafasy','basit':'ar.abdulsamad','minshawi':'ar.minshawi','ajmi':'ar.ahmedajamy','yasser':'ar.yasseraldosari','muaiqly':'ar.mahermuaiqly','shuraim':'ar.saoodshuraym','ayyub':'ar.muhammadayyoub','rifai':'ar.hanirifai','nasser':'ar.nasserqatami','sudais':'ar.abdurrahmaansudais','husary':'ar.husary','ghamdi':'ar.saadalghamdi','hudhaify':'ar.hudhaify','basfar':'ar.abdullahbasfar','jibreel':'ar.muhammadjibreel','tablaway':'ar.mohammadaltablawi','juhany':'ar.abdullahaljuhany','banna':'ar.mahmoodalbanna','qasim':'ar.muhsinalqasim','shatri':'ar.abubakrshatri','ali_jaber':'ar.alijaber','fares_abbad':'ar.faresabbad','abdulrahman_ossi':'ar.abdulrahmanalossi','omar_qazabri':'ar.omarqazabri','luhaidan':'ar.mohammadalluhaidan','matrood':'ar.abdullahmatrood','hawashi':'ar.ahmadalhawashi'};
+var SURAHS_AYAH_COUNT=[7,286,200,176,120,165,206,75,129,109,123,111,43,52,99,128,111,110,98,135,112,78,118,64,77,227,93,88,69,60,34,30,73,54,45,83,182,88,75,85,54,53,89,59,37,35,38,29,18,45,60,49,62,55,78,96,29,22,24,13,14,11,11,18,12,12,30,52,52,44,28,28,20,56,40,31,50,40,46,42,29,19,36,25,22,17,19,26,30,20,15,21,11,8,8,19,5,8,8,11,11,8,3,9,5,4,7,3,6,3,5,4,5,6];
+var memState={surah:1, ayah:1, repeat:1, repeatLeft:1, totalAyahs:7, playing:false};
+function globalAyahNum(surah, ayah){var g=0;for(var i=0;i<surah-1;i++)g+=SURAHS_AYAH_COUNT[i];return g+ayah;}
+async function playQuran(num){
+  currentSurah=num;
+  var rec=$('quranReciter').value;
+  var repVal=$('quranRepeat').value;
+  var lang=$('quranLang').value;
+  $('quranAudioBox').style.display='block';
+  var rep = repVal==='loop'? 999 : parseInt(repVal)||1;
+  memState={surah:num, ayah:1, repeat:rep, repeatLeft:rep, repeatMode:repVal, totalAyahs:SURAHS_AYAH_COUNT[num-1], playing:true};
+  await loadSurahAyahs(num,lang);
+  showSummary('quran',num);
+  playCurrentAyah(rec);
+}
+var EVERYAYAH_MAP={'alafasy':'Alafasy_128kbps','basit':'Abdul_Basit_Murattal_192kbps','minshawi':'Minshawy_Murattal_128kbps','ajmi':'Ahmed_ibn_Ali_al-Ajamy_128kbps_ketaballah.net','yasser':'Yasser_Ad-Dussary_128kbps','muaiqly':'Maher_AlMuaiqly_64kbps','shuraim':'Saood_ash-Shuraym_64kbps','ayyub':'Muhammad_Ayyub_128kbps','rifai':'Hani_Rifai_192kbps','nasser':'Nasser_Alqatami_128kbps','sudais':'Abdurrahmaan_As-Sudais_192kbps','husary':'Husary_128kbps','ghamdi':'Ghamadi_40kbps','hudhaify':'Hudhaify_128kbps','basfar':'Abdullah_Basfar_192kbps','jibreel':'Muhammad_Jibreel_128kbps','tablaway':'Mohammad_al_Tablaway_128kbps','juhany':'Abdullaah_3awwaad_Al-Juhaynee_128kbps','banna':'Mahmood_AlBanna_32kbps','qasim':'Muhsin_Al_Qasim_192kbps','shatri':'Abu_Bakr_Ash-Shaatree_128kbps','ali_jaber':'Ali_Jaber_64kbps','fares_abbad':'Fares_Abbad_64kbps','abdulrahman_ossi':'Abdurrahmaan_Al-Ossi_64kbps','omar_qazabri':'Omar_Al_Qazabri_128kbps','luhaidan':'Mohammad_Al_Luhaidan_128kbps','matrood':'Abdullah_Matroud_128kbps','hawashi':'Ahmad_Al_Hawashi_128kbps'};
+function playCurrentAyah(rec){
+  var edition = AYAH_EDITION[rec]||'ar.alafasy';
+  var g = globalAyahNum(memState.surah, memState.ayah);
+  var url = 'https://cdn.islamic.network/quran/audio/128/'+edition+'/'+g+'.mp3';
+  var audio=$('quranAudio');
+  audio.dataset.fallback='0';
+  audio.dataset.cdnUrl=url;
+  // EveryAyah fallback URL
+  var everyRec = EVERYAYAH_MAP[rec]||'Alafasy_128kbps';
+  var surPad=String(memState.surah).padStart(3,'0');
+  var ayahPad=String(memState.ayah).padStart(3,'0');
+  audio.dataset.everyUrl='https://everyayah.com/data/'+everyRec+'/'+surPad+ayahPad+'.mp3';
+  audio.src=url;
+  audio.loop=false;
+  audio.play().catch(function(){ tryEveryFallback(); });
+  highlightAyah(memState.ayah);
+}
+function tryEveryFallback(){
+  var audio=$('quranAudio');
+  if(audio.dataset.fallback==='1') { setTimeout(function(){ onAyahEnded(); }, 700); return; }
+  audio.dataset.fallback='1';
+  audio.src=audio.dataset.everyUrl;
+  audio.play().catch(function(){ setTimeout(function(){ onAyahEnded(); }, 700); });
+}
+function highlightAyah(n){
+  document.querySelectorAll('#quranAyahsBox .ayah').forEach(function(el){
+    el.style.background = parseInt(el.dataset.num)===n ? 'rgba(108,99,255,0.25)' : 'transparent';
+    el.style.borderRight = parseInt(el.dataset.num)===n ? '4px solid var(--accent)' : 'none';
+  });
+  var el=document.querySelector('#quranAyahsBox .ayah[data-num="'+n+'"]');
+  if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
+}
+function onAyahEnded(){
+  if(!memState.playing) return;
+  // وضع الحلقة المستمرة (loop) -> اعد نفس الآية للابد
+  if(memState.repeatMode==='loop'){
+    var audio=$('quranAudio');
+    audio.currentTime=0;
+    audio.play().catch(function(){});
+    return;
+  }
+  if(memState.repeatLeft > 1){
+    memState.repeatLeft--;
+    var audio=$('quranAudio');
+    audio.currentTime=0;
+    audio.play().catch(function(){});
+    return;
+  }
+  memState.repeatLeft = memState.repeat;
+  memState.ayah++;
+  if(memState.ayah > memState.totalAyahs){
+    memState.playing=false;
+    return;
+  }
+  var rec=$('quranReciter').value;
+  playCurrentAyah(rec);
+}
+// استمع لانتهاء الصوت
+document.addEventListener('DOMContentLoaded',function(){
+  var a=$('quranAudio');
+  if(a){ a.addEventListener('ended', onAyahEnded); a.addEventListener('error', function(){ tryEveryFallback(); }); }
+  // تغيير التكرار اثناء التشغيل
+  var repSel=$('quranRepeat');
+  if(repSel) repSel.addEventListener('change', function(){ var v=this.value; memState.repeat = v==='loop'?999:parseInt(v)||1; memState.repeatLeft = memState.repeat; });
+});
+// تحكم تكبير/تصغير/سطوع
+var zoomLevel=1;
+function changeZoom(d){zoomLevel=Math.min(1.4,Math.max(0.85,zoomLevel+d));document.documentElement.style.fontSize=(zoomLevel*16)+'px';localStorage.setItem('zoom',zoomLevel)}
+function changeBrightness(v){document.body.style.filter='brightness('+v+'%)'}
+if(localStorage.getItem('zoom')){zoomLevel=parseFloat(localStorage.getItem('zoom'));document.documentElement.style.fontSize=(zoomLevel*16)+'px'}
+function stopAyah(){memState.playing=false;var a=$('quranAudio');a.pause();a.currentTime=0;$('nowPlaying').textContent='⏹️ توقف';}
+function exitQuranMode(){stopAyah();$('quranAudioBox').style.display='none';}
+function prevAyah(){if(memState.ayah>1){memState.ayah--;memState.repeatLeft=memState.repeat;var rec=$('quranReciter').value;playCurrentAyah(rec);} }
+function nextAyah(){if(memState.ayah<memState.totalAyahs){memState.ayah++;memState.repeatLeft=memState.repeat;var rec=$('quranReciter').value;playCurrentAyah(rec);} }
+function playSelectedAyah(num){var repVal=$('quranRepeat').value;var rep=repVal==='loop'?999:parseInt(repVal)||1;memState.ayah=num;memState.repeat=rep;memState.repeatLeft=rep;memState.repeatMode=repVal;var rec=$('quranReciter').value;playCurrentAyah(rec); var lang=$('quranLang').value; highlightAyah(num);}
+var RECITERS_BASE={};
+async function loadSurahAyahs(num,lang){try{var d=await api('/api/quran/ayahs/'+num+'?lang='+lang);var box=$('quranAyahsBox');var html='<div style="text-align:center;padding:6px;color:var(--accent);font-size:12px">'+d.name+' - '+d.ayahs.length+' آيات ('+d.source+')</div>';d.ayahs.forEach(function(a){var showAr='<div style="font-size:15px;font-weight:600;text-align:right;line-height:1.8">'+a.ar+'</div>';var trans='';if(lang==='en'&&a.en)trans='<div style="font-size:13px;color:rgba(200,230,255,0.9);text-align:left;margin-top:4px;border-left:3px solid #4facfe;padding-left:8px;background:rgba(79,172,254,0.08);border-radius:4px;padding:6px 8px">'+a.en+'</div>';if(lang==='fr'&&a.fr)trans='<div style="font-size:13px;color:rgba(255,220,200,0.9);text-align:left;margin-top:4px;border-left:3px solid var(--accent2);padding-left:8px;background:rgba(255,107,107,0.08);border-radius:4px;padding:6px 8px">'+a.fr+'</div>';if(lang==='ber'&&a.ber)trans='<div style="font-size:13px;color:rgba(255,240,180,0.9);text-align:left;margin-top:4px;border-left:3px solid #f9d342;padding-left:8px;background:rgba(249,211,66,0.08);border-radius:4px;padding:6px 8px">ⵜⴰⵙⵓⵖⵍⵜ: '+a.ber+'</div>';html+='<div class="ayah" data-num="'+a.number+'" onclick="playSelectedAyah('+a.number+')" title="انقر لتكرار هذه الآية" style="padding:10px 6px;border-bottom:1px solid var(--border);transition:background 0.2s;cursor:pointer"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><b style="color:var(--accent)">'+a.number+'.</b><button onclick="event.stopPropagation();playSelectedAyah('+a.number+')" style="font-size:11px;padding:4px 10px;border:none;border-radius:20px;background:var(--accent);color:#fff;cursor:pointer">▶️ تكرار</button></div>'+showAr+trans+'</div>'});box.innerHTML=html; // تحديث عنوان المشغل
+if(memState.playing){$('nowPlaying').textContent='▶️ سورة '+d.name+' - آية '+memState.ayah+' / '+d.ayahs.length+' (×'+(memState.repeatMode==='loop'?'∞':memState.repeat)+')';}
+}catch(e){$('quranAyahsBox').innerHTML='<div class="empty">خطأ في تحميل الترجمة</div>'}}
+// تم استبداله بنظام تكرار كل آية
+// Hadith
+async function searchHadith(){var q=$('hadithQuery').value.trim();var coll=$('hadithCollection').value;$('hadithResults').innerHTML='<div class="loading"><div class="spinner"></div></div>';try{var d=await api('/api/hadith/search',{method:'POST',body:JSON.stringify({query:q,collection:coll})});var html='';d.hadiths.forEach(function(h){var transHadith=''; if(ST.lang==='ber'&&h.text_ber) transHadith='<p style="background:rgba(249,211,66,0.1);padding:8px;border-radius:8px"><b>ⵜⴰⵎⴰⵣⵉⵖⵜ:</b> '+h.text_ber+'</p>'; else if(ST.lang==='en'&&h.text_en) transHadith='<p><b>EN:</b> '+h.text_en+'</p>'; else if(ST.lang==='fr'&&h.text_fr) transHadith='<p><b>FR:</b> '+h.text_fr+'</p>'; else transHadith='<p><b>EN:</b> '+h.text_en+'</p><p><b>FR:</b> '+h.text_fr+'</p><p style="color:#f9d342"><b>ⵜⴰⵎⴰⵣⵉⵖⵜ:</b> '+(h.text_ber||'')+'</p>'; var expl=ST.lang==='ber'&&h.explanation_ber? h.explanation_ber : ST.lang==='en'&&h.explanation_en? h.explanation_en : ST.lang==='fr'&&h.explanation_fr? h.explanation_fr : h.explanation_ar; html+='<div class="card"><div class="card-info"><h3>'+h.topic+' <small>('+h.collection+' - '+h.grade+')</small></h3><p><b>الراوي:</b> '+h.narrator+'</p><p style="background:rgba(108,99,255,0.1);padding:10px;border-radius:8px">'+h.text_ar+'</p>'+transHadith+'<div style="background:rgba(39,174,96,0.1);padding:10px;border-radius:8px;margin-top:6px"><b>الشرح:</b> '+expl+'</div>'+'<div class="card-actions"><button class="btn-primary" onclick="downloadHadith('+h.id+')">تحميل</button><button class="btn-secondary" onclick="showSummary(\'hadith\',\''+h.id+'\')">بطاقة</button></div></div></div>'});if(!d.hadiths.length)html='<div class="empty">'+t('no_results')+'</div>';$('hadithResults').innerHTML=html}catch(e){$('hadithResults').innerHTML='<div class="empty">'+t('hadith_error')+'</div>'}}
+async function downloadHadith(id){try{var d=await api('/api/hadith/download',{method:'POST',body:JSON.stringify({surah_number:id,reciter:'alafasy',token:ST.token})});ST.dlId=d.download_id;startDlPoll();$('downloadBar').style.display='block'}catch(e){alert(t('error')+': '+e.message)}}
+async function showSummary(kind,id){switchTab('summary',document.querySelector('[onclick*=\"summary\"]'));try{var d=await api('/api/summary/'+kind+'/'+id);var html='<div class="card" style="border-left:4px solid var(--accent)"><div class="card-info"><h3>بطاقة تعريفية - '+d.title+'</h3>';if(d.type)html+='<p><b>النوع:</b> '+d.type+' | آيات: '+(d.ayahs||'')+'</p>';if(d.reason)html+='<p><b>سبب النزول:</b> '+d.reason+'</p>';if(d.tafsir)html+='<p><b>التفسير:</b> '+d.tafsir+'</p>';if(d.text_ar)html+='<p style="background:rgba(108,99,255,0.1);padding:10px;border-radius:8px">'+d.text_ar+'</p>';if(d.explanation)html+='<p><b>الشرح:</b> '+d.explanation+'</p>';if(d.summary)html+='<p>'+d.summary+'</p>';if(d.platforms)html+='<p><b>المنصات:</b> '+d.platforms.join(', ')+'</p>';html+='<div class="card-actions"><button class="btn-secondary" onclick="switchTab(\'movies\',document.querySelector(\'.tabs button\'))">رجوع</button></div></div></div>';$('summaryBox').innerHTML=html;document.getElementById('tab-summary').classList.add('active')}catch(e){$('summaryBox').innerHTML='<div class="empty">'+t('error')+': '+e.message+'</div>'}}
+// تحديث قاعدة القراء للصوت المباشر
+(async function(){try{var r=await fetch('/api/quran/reciters').then(x=>x.json());r.reciters.forEach(function(rc){RECITERS_BASE[rc.id]=rc.base_url||''})}catch(e){}})();
+async function loadSettings(){try{var d=await api('/api/settings/download-dir');$('currentSaveDir').textContent=d.download_dir;$('saveDirInput').value=d.download_dir}catch(e){}}
+function showSettings(){$('settingsModal').classList.add('show');loadSettings()}
+async function changeSaveDir(){var p=$('saveDirInput').value.trim();if(!p||!ST.token)return;try{var d=await api('/api/settings/download-dir',{method:'POST',body:JSON.stringify({path:p,token:ST.token})});$('currentSaveDir').textContent=d.download_dir}catch(e){alert(t('error')+': '+e.message)}}
+document.addEventListener('DOMContentLoaded',function(){var saved=localStorage.getItem('lang');if(saved)ST.lang=saved;$('langSelect').value=ST.lang;applyLang();if(ST.token)showMain();else showLogin()});
+</script>
+</body>
+</html>
