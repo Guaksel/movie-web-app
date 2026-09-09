@@ -60,6 +60,31 @@ api_keys_store = {
     "PREMIUM-DEMO-001": {"plan": "monthly", "expires": "2027-12-31", "daily_downloads": 50, "active": True},
 }
 
+def _load_keys_from_json():
+    """Load API keys from keys.json into api_keys_store at startup."""
+    import json as _json
+    for candidate in [resource_path("keys.json"), "keys.json"]:
+        try:
+            with open(candidate, "r", encoding="utf-8") as f:
+                data = _json.load(f)
+            for k, v in data.items():
+                api_keys_store[k] = {
+                    "plan": v.get("plan", "monthly"),
+                    "expires": v.get("expires", "2027-12-31"),
+                    "daily_downloads": v.get("daily_downloads", 50),
+                    "active": v.get("active", True),
+                }
+            logger.info(f"Loaded {len(data)} keys from {candidate}")
+            return
+        except FileNotFoundError:
+            continue
+        except Exception as e:
+            logger.warning(f"Failed to load keys from {candidate}: {e}")
+            return
+    logger.warning("keys.json not found — only built-in keys available")
+
+_load_keys_from_json()
+
 search_cache = {}
 CACHE_TTL = 300
 
