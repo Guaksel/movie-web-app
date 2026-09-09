@@ -10,5 +10,95 @@
     "expires": "2026-09-06",
     "daily_downloads": 5,
     "active": true
+  },
+  "PREMIUM-FB3A9B50": {
+    "plan": "monthly",
+    "expires": "2026-10-08",
+    "daily_downloads": 50,
+    "active": true
+  },
+  "PREMIUM-8FE1504E": {
+    "plan": "monthly",
+    "expires": "2026-10-09",
+    "daily_downloads": 50,
+    "active": true
+  },
+  "PREMIUM-F32B3C81": {
+    "plan": "monthly",
+    "expires": "2026-10-09",
+    "daily_downloads": 50,
+    "active": true
+  },
+  "PREMIUM-D6A52426": {
+    "plan": "monthly",
+    "expires": "2026-10-09",
+    "daily_downloads": 50,
+    "active": true
+  },
+  "PREMIUM-0A776BC0": {
+    "plan": "monthly",
+    "expires": "2026-10-09",
+    "daily_downloads": 50,
+    "active": true
+  },
+  "PREMIUM-7DA5351A": {
+    "plan": "monthly",
+    "expires": "2026-10-09",
+    "daily_downloads": 50,
+    "active": true
+  },
+  "PREMIUM-A860367C": {
+    "plan": "monthly",
+    "expires": "2026-10-09",
+    "daily_downloads": 50,
+    "active": true
+  },
+  "PREMIUM-5B74E70A": {
+    "plan": "monthly",
+    "expires": "2026-10-09",
+    "daily_downloads": 50,
+    "active": true
+  },
+  "PREMIUM-79C68F67": {
+    "plan": "monthly",
+    "expires": "2026-10-09",
+    "daily_downloads": 50,
+    "active": true
+  },
+  "PREMIUM-47F8636B": {
+    "plan": "monthly",
+    "expires": "2026-10-09",
+    "daily_downloads": 50,
+    "active": true
+  },
+  "PREMIUM-1001A57E": {
+    "plan": "monthly",
+    "expires": "2026-10-09",
+    "daily_downloads": 50,
+    "active": true
+  },
+  "PREMIUM-44758A62": {
+    "plan": "monthly",
+    "expires": "2026-10-09",
+    "daily_downloads": 50,
+    "active": true
+  },
+  "PREMIUM-F8E1B5D4": {
+    "plan": "monthly",
+    "expires": "2026-10-09",
+    "daily_downloads": 50,
+    "active": true
+  },
+  "PREMIUM-508ED84B": {
+    "plan": "monthly",
+    "expires": "2026-10-09",
+    "daily_downloads": 50,
+    "active": true
+  },
+  "PREMIUM-DE5429B8": {
+    "plan": "monthly",
+    "expires": "2026-10-09",
+    "daily_downloads": 50,
+    "active": true
   }
 }
